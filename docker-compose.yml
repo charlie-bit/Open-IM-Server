@@ -4,13 +4,15 @@ networks:
   openim:
     driver: bridge
 
+# 部署中间件 docker-compose -f docker-compose.yml --env-file .env up -d
+
 services:
   mongodb:
     image: "${MONGO_IMAGE}"
     ports:
       - "37017:27017"
-    container_name: mongo
-    command: ["/bin/bash", "-c", "/docker-entrypoint-initdb.d/mongo-init.sh; docker-entrypoint.sh mongod --wiredTigerCacheSizeGB 1 --auth"]
+    container_name: openim_mongo
+    command: [ "/bin/bash", "-c", "/docker-entrypoint-initdb.d/mongo-init.sh; docker-entrypoint.sh mongod --wiredTigerCacheSizeGB 1 --auth" ]
     volumes:
       - "${DATA_DIR}/components/mongodb/data/db:/data/db"
       - "${DATA_DIR}/components/mongodb/data/logs:/data/logs"
@@ -30,9 +32,9 @@ services:
 
   redis:
     image: "${REDIS_IMAGE}"
-    container_name: redis
+    container_name: openim_redis
     ports:
-      - "16379:6379"
+      - "26379:6379"
     volumes:
       - "${DATA_DIR}/components/redis/data:/data"
       - "${DATA_DIR}/components/redis/config/redis.conf:/usr/local/redis/config/redis.conf"
@@ -47,7 +49,7 @@ services:
 
   zookeeper:
     image: "${ZOOKEEPER_IMAGE}"
-    container_name: zookeeper
+    container_name: openim_zookeeper
     ports:
       - "12181:2181"
     environment:
@@ -59,7 +61,7 @@ services:
 
   kafka:
     image: "${KAFKA_IMAGE}"
-    container_name: kafka
+    container_name: openim_kafka
     user: root
     restart: always
     ports:
@@ -87,7 +89,7 @@ services:
     ports:
       - "10005:9000"
       - "19090:9090"
-    container_name: minio
+    container_name: openim_minio
     volumes:
       - "${DATA_DIR}/components/mnt/data:/data"
       - "${DATA_DIR}/components/mnt/config:/root/.minio"
@@ -100,22 +102,22 @@ services:
     networks:
       - openim
 
-  openim-web-front:
-    image: ${OPENIM_WEB_FRONT_IMAGE}
-    container_name: openim-web-front
-    restart: always
-    ports:
-      - "11001:80"
-    networks:
-      - openim
-
-  openim-admin-front:
-    image: ${OPENIM_ADMIN_FRONT_IMAGE}
-    container_name: openim-admin-front
-    restart: always
-    ports:
-      - "11002:80"
-    networks:
-      - openim
+#  openim-web-front:
+#    image: ${OPENIM_WEB_FRONT_IMAGE}
+#    container_name: openim-web-front
+#    restart: always
+#    ports:
+#      - "11001:80"
+#    networks:
+#      - openim
+#
+#  openim-admin-front:
+#    image: ${OPENIM_ADMIN_FRONT_IMAGE}
+#    container_name: openim-admin-front
+#    restart: always
+#    ports:
+#      - "11002:80"
+#    networks:
+#      - openim
 
 
